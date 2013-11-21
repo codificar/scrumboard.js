@@ -1,0 +1,20 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" media="all" href="http://code.jquery.com/ui/1.10.3/themes/smoothness/jquery-ui.css" />
+	<link rel="stylesheet" type="text/css" media="all" href="src/css/scrumboard.css" />
+	<script type="text/javascript" language="javascript" src="http://code.jquery.com/jquery-1.9.1.js"></script>
+	<script type="text/javascript" language="javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+	<script type="text/javascript" language="javascript" src="src/js/scrumboard.js"></script>
+</head>
+
+<body>
+	<div class="scrum"></div>
+	<script type="text/javascript">
+		$(document).ready(function(){
+			$('.scrum').scrum().scrum.addProject('project_1', 'Project 1', '#7c5450', 'white').addProject('project_2', 'Project 2', '#55979a', 'black').addProject('project_3', 'Project 3', '#e74c3c', 'white');
+		});
+	</script>
+</body>
+</html>

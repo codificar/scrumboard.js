@@ -1,0 +1,161 @@
+@import url(http://fonts.googleapis.com/css?family=Lato);
+
+body {
+	font-family: Lato;
+}
+
+.scrum {
+	width: 936px;
+}
+.scrum_project_header {
+	float: left;
+	display: block;
+	margin-top: 22px;
+	width: 100px;
+}
+
+.scrum_project_title{
+	float: left;
+	cursor: pointer;
+	width: 98px;
+	height: 120px;
+	margin-top: -1px;
+	margin-bottom: 0px;
+	margin-right: 10px;
+	border: solid 1px #909090;
+	text-align: center;
+	overflow:hidden;
+}
+
+.scrum_project_title:last-child {
+	border-bottom: solid 1px #909090;
+}
+
+.scrum_column_header {
+	text-align: center;
+	height: 20px;
+	width: 836px;
+	margin-left: 100px;
+}
+
+.scrum_column_title {
+	float: left;
+    width: 208px;
+    height: 20px;
+	margin-left: -1px;
+	border: solid 1px #909090;
+	box-shadow: 0px 0px 0px rgb(136, 136, 136);
+	text-align: center;
+	cursor: default;
+}
+
+#done.scrum_column_title {
+	cursor: pointer;
+}
+
+.scrum_container {
+	display: inline-block;
+	width: 836px;
+}
+
+.scrum_column {
+	float: left;
+    background-clip: padding-box;
+    width: 208px;
+	border-right: solid 1px #adaaaa;
+}
+
+#todo.scrum_column {
+	background-color: #ebebeb;
+}
+
+#ongoing.scrum_column {
+	background-color: #ffcd46;
+}
+
+#done.scrum_column {
+	background-color: #55979a;
+}
+
+#problem.scrum_column {
+	background-color: #e74c3c;
+}
+
+.scrum_project {
+	float: left;
+	display: block;
+	width: 208px;
+	height: 120px;
+	border-bottom:solid 1px;
+}
+
+.scrum_project:nth-child(even) {
+	background-color: rgba(255, 255, 255, 0.38);
+}
+
+.scrum_task {
+	float:left;
+    cursor: move;
+	background-color: rgb(55, 116, 55);
+	margin: 3px;
+	margin-bottom: 3px;
+	text-align: center;
+	color: white;
+	width: 96px;
+	height: 50px;
+	border: solid 1px white;
+	border-radius: 2px;
+	box-shadow: 2px 2px 2px rgb(136, 136, 136);
+	overflow:hidden;
+	z-index: 1;
+}
+
+.scrum_task:hover {
+	z-index: 3;
+}
+
+.scrum_task_edit {
+	z-index: 2;
+}
+
+.scrum_task > p {
+	margin: 0;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: bold;
+}
+
+.scrum_task > p.user {
+	color: white;
+	background-color: rgba(47, 76, 235, 0.5);
+	width:100%;
+	position:absolute;
+	text-align:right;
+	bottom: 0;
+}
+
+.scrum_task > input {
+	background-color: rgba(0, 0, 0, 0.24);
+	width: 95%;
+	margin-top: 2px;
+}
+
+.ui-draggable-dragging {
+	z-index: 50;
+	background: none;
+	background-color: rgba(55, 116, 55, 0.44);
+}
+
+input {
+	background-color:transparent;
+	border-color:transparent;
+	color: white;
+	font-size: 12px;
+	font-family: Arial;
+	font-weight: bold;
+}
+
+input.user {
+	background-color: rgba(47, 76, 235, 0.8);
+}
+
