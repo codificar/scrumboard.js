@@ -257,14 +257,25 @@ $.fn.scrum.parseJSON = function(json) {
 	});
 };
 
-// TODO: iterate throught tasks
+// TODO: deal with on editMode tasks
 $.fn.scrum.getJSON = function() {
+	var local = this;
 	var return_array = new Array();
-	$('.scrum_project', this).each(function(){
-		var project_id = this.attr('id');
+	$('#todo.scrum_column > .scrum_project', local).each(function(){
+		var project_id = $(this).attr('id');
+		var task_array = new Array();
+		$('#' + project_id + '> .scrum_task', local).each(function(i, v) {
+			task_array.push({
+				task_id: $(this).attr('id'),
+				task_name: $('.name', this).html(),
+				user_name: $('.user', this).html(),
+				status: $(this).parent('.scrum_column').attr('id')
+			});
+		});
 		return_array.push({
 			project_id: project_id,
-			project_name: $('#' + project_id + '.scrum_project_title').html()
+			project_name: $('#' + project_id + '.scrum_project_title').html(),
+			tasks: task_array
 		});
 	});
 	return JSON.stringify(return_array);
