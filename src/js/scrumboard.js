@@ -7,8 +7,22 @@ scrum = {
 // -- API Methods --
 
 // To be edited
-scrum.changeStatus = function(task_id, status) {
-	console.log(task_id + '{name: "' + $('#' + task_id + '> p.name').html() + '", user: "' + $('#' + task_id + '> p.user').html() + '"}: ' + status);
+scrum.changeStatus = function(task) {
+	console.log(task);
+	console.log('Task Moved: [task_id: "' + task.task_id + '" task_name: "' + task.task_name + '" project_id: "' + task.project_id + '" user_name: "' + task.user_name + '" status: "' + task.status + '"]');	
+}
+
+scrum.taskCreated = function(task) {
+	console.log('Task Created: [task_id: "' + task.task_id + '" task_name: "' + task.task_name + '" project_id: "' + task.project_id + '" user_name: "' + task.user_name + '"]');
+}
+
+// TODO: change to array
+scrum.taskEdited = function(task) {
+	console.log('Task Edited: [task_id: "' + task_id + '" task_name: "' + task_name + '" project_id: "' + project_id + '" user_name: "' + user_name + '"]');
+}
+// TODO: make and call
+scrum.taskDeleted = function() {
+
 }
 
 scrum.editMode = function(ui) {
@@ -53,6 +67,14 @@ scrum.editMode = function(ui) {
 				$(ui).html(p_name);
 				$(ui).append(p_user);
 				$(ui).removeClass('scrum_task_edit');
+				
+				// Throw event
+				scrum.taskEdited({
+					task_id: $(ui).attr('id'), 
+					task_name: p_name.html(),
+					project_id: $(ui).parent('.scrum_project').attr('id'),
+					user_name: p_user.html()
+				});
 			}
 		};
 
@@ -133,7 +155,13 @@ $.fn.scrum = function() {
 			return (ui.parent().attr('id') == $(this).attr('id'));
 		},
 		drop: function(e, ui) {
-			scrum.changeStatus($(ui.draggable).attr('id'), $(this).parent().attr('id'));
+			scrum.changeStatus({
+				task_id: $(ui.draggable).attr('id'),
+				task_name: $('#' + task_id + '> .name').html() || $('#' + task_id + '> .name').val(),
+				user_name: $('#' + task_id + '> .user').html() || $('#' + task_id + '> .user').val(),
+				project_id: $(this).attr('id'),
+				status: $(this).parent('.scrum_column').attr('id')
+			});
 		}
 	});
 
@@ -184,6 +212,13 @@ $.fn.scrum.addTask = function(task_id, task_name, project_id, user_name, status_
 	if(container.children('.scrum_task').length > 4) {
 		container.children('.scrum_task').css('margin-bottom', '-35px');
 	}
+	// Throw event
+	scrum.taskCreated({
+		task_id: task_id,
+		task_name: task_name,
+		project_id: project_id,
+		user_name: user_name
+	});
 	
 	return task;
 };
@@ -241,13 +276,20 @@ $.fn.scrum.addProject = function(project_id, project_name, bg_color, text_color)
 			} else {
 				$(this).children('.scrum_task').css('margin-bottom', '3px');
 			}
-			scrum.changeStatus(task_id, status);
+			scrum.changeStatus({
+				task_id: task_id,
+				task_name: $('#' + task_id + '> .name').html() || $('#' + task_id + '> .name').val(),
+				user_name: $('#' + task_id + '> .user').html() || $('#' + task_id + '> .user').val(),
+				project_id: $(this).attr('id'),
+				status: status
+			});
 		}
 	});
 	
 	return this;
 }
 
+// Parse projects with tasks JSON
 $.fn.scrum.parseJSON = function(json) {
 	var scrum = this;
 	$.each(eval(json), function(i, project) {
@@ -257,7 +299,7 @@ $.fn.scrum.parseJSON = function(json) {
 	});
 };
 
-// TODO: deal with on editMode tasks
+// Return projects with tasks JSON
 $.fn.scrum.getJSON = function() {
 	var local = this;
 	var return_array = new Array();
@@ -265,11 +307,14 @@ $.fn.scrum.getJSON = function() {
 		var project_id = $(this).attr('id');
 		var task_array = new Array();
 		$('#' + project_id + '> .scrum_task', local).each(function(i, v) {
+			var name = $('.name', this);
+			var user = $('.user', this);
 			task_array.push({
 				task_id: $(this).attr('id'),
-				task_name: $('.name', this).html(),
-				user_name: $('.user', this).html(),
-				status: $(this).parent('.scrum_column').attr('id')
+				// Get values from editMode tasks
+				task_name: $('.name', this).html() || $('.name', this).val(),
+				user_name: $('.user', this).html() || $('.user', this).val(),
+				status: $(this).parents('.scrum_column').attr('id')
 			});
 		});
 		return_array.push({
