@@ -1,31 +1,11 @@
+// -- Global Values and Functions --
 scrum = {
 	task_id: 10000,
 	default_user_name: 'User',
 	default_task_name: 'Task'
 };
 
-// -- API Methods --
-
-// To be edited
-scrum.changeStatus = function(task) {
-	console.log(task);
-	console.log('Task Moved: [task_id: "' + task.task_id + '" task_name: "' + task.task_name + '" project_id: "' + task.project_id + '" user_name: "' + task.user_name + '" status: "' + task.status + '"]');	
-}
-
-scrum.taskCreated = function(task) {
-	console.log('Task Created: [task_id: "' + task.task_id + '" task_name: "' + task.task_name + '" project_id: "' + task.project_id + '" user_name: "' + task.user_name + '"]');
-}
-
-// TODO: change to array
-scrum.taskEdited = function(task) {
-	console.log('Task Edited: [task_id: "' + task_id + '" task_name: "' + task_name + '" project_id: "' + project_id + '" user_name: "' + user_name + '"]');
-}
-// TODO: make and call
-scrum.taskDeleted = function() {
-
-}
-
-scrum.editMode = function(ui) {
+scrum._editMode = function(ui) {
 	if(!$(ui).hasClass('scrum_task_edit')) {
 		$(ui).addClass('scrum_task_edit');
 
@@ -69,12 +49,16 @@ scrum.editMode = function(ui) {
 				$(ui).removeClass('scrum_task_edit');
 				
 				// Throw event
-				scrum.taskEdited({
+				var project_id = $(ui).parent('.scrum_project').attr('id');
+				var local = $(ui).parents('.scrum');
+				$(local).trigger('task_edited', [{
 					task_id: $(ui).attr('id'), 
 					task_name: p_name.html(),
-					project_id: $(ui).parent('.scrum_project').attr('id'),
-					user_name: p_user.html()
-				});
+					user_name: p_user.html(),
+					status: $(ui).parents('.scrum_column').attr('id'),
+					project_id: project_id,
+					project_name: $('#' + project_id + '.scrum_project_title', local).html()
+				}]);
 			}
 		};
 
@@ -96,6 +80,7 @@ scrum.editMode = function(ui) {
 
 $.fn.scrum = function() {
 	var local = this;
+	
 	// Create structure
 	$(this).append($('<div>', {class: 'scrum_project_header'}))
 	.append($('<div>', {class: 'scrum_column_header'}).append($('<div>', {
@@ -139,41 +124,35 @@ $.fn.scrum = function() {
 			id: 'problem'
 		}))
    );
-	
-	// For HTML added scrum tasks and projects
-	var scrum_task = $('.scrum_task', this);
-	var scrum_project = $('.scrum_project', this);
-
-	// -- DRAG AND DROP --
-	scrum_task.draggable({
-		containment: '.scrum_container',
-		revert: 'invalid'
-	});
-
-	scrum_project.droppable({
-		accept: function(ui) {
-			return (ui.parent().attr('id') == $(this).attr('id'));
-		},
-		drop: function(e, ui) {
-			scrum.changeStatus({
-				task_id: $(ui.draggable).attr('id'),
-				task_name: $('#' + task_id + '> .name').html() || $('#' + task_id + '> .name').val(),
-				user_name: $('#' + task_id + '> .user').html() || $('#' + task_id + '> .user').val(),
-				project_id: $(this).attr('id'),
-				status: $(this).parent('.scrum_column').attr('id')
-			});
-		}
-	});
 
 	// -- EDITING --
 	$(document).on('dblclick', '.scrum_task', function() {
-		scrum.editMode(this);
+		scrum._editMode(this);
+	});
+
+	$('.scrum_task').on('remove', function() {
+		console.log('time to trigger deleted');
+		var task_id = $(this).attr('id');
+		var task_name = $('#' + task_id + '> .name').html() || $('#' + task_id + '> .name').val();
+		var user_name = $('#' + task_id + '> .user').html() || $('#' + task_id + '> .user').val();
+		var status = $(this).parents('.scrum_column').attr('id');
+		var project_id = $(this).parent().attr('id');
+		var project_name = $('#' + project_id + '.scrum_project_title', local).html();
+		$(local).trigger('task_deleted'[{
+			task_id: task_id,
+			task_name: task_name,
+			user_name: user_name,
+			status: status,
+			project_id: project_id,
+			project_name: project_name
+		}]);
 	});
 	
 	return this;
 }
 
 $.fn.scrum.addTask = function(task_id, task_name, project_id, user_name, status_id) {
+	var local = this;
 	if(!status_id) status_id = 'todo';
 	
 	var container = $('#' + status_id + '.scrum_column > #' + project_id + '.scrum_project', this);
@@ -212,13 +191,33 @@ $.fn.scrum.addTask = function(task_id, task_name, project_id, user_name, status_
 	if(container.children('.scrum_task').length > 4) {
 		container.children('.scrum_task').css('margin-bottom', '-35px');
 	}
-	// Throw event
-	scrum.taskCreated({
+	
+	// Bind delete action
+	$(task).on('remove', function() {
+		// Values used more than once
+		var task_id = $(this).attr('id');
+		var project_id = $(this).parent().attr('id');
+		
+		// Trigger deleted event
+		$(this).parents('.scrum').trigger('task_deleted', [{
+			task_id: task_id,
+			task_name: $('#' + task_id + '> .name').html() || $('#' + task_id + '> .name').val(),
+			user_name: $('#' + task_id + '> .user').html() || $('#' + task_id + '> .user').val(),
+			status: $(this).parents('.scrum_column').attr('id'),
+			project_id: project_id,
+			project_name: $('#' + project_id + '.scrum_project_title', local).html()
+		}]);
+	});
+	
+	// Trigger created event
+	$(container).parents('.scrum').trigger('task_created', [{
 		task_id: task_id,
 		task_name: task_name,
+		user_name: user_name,
+		status: status_id,
 		project_id: project_id,
-		user_name: user_name
-	});
+		project_name: $('#' + project_id + '.scrum_project_title', local).html()
+	}]);
 	
 	return task;
 };
@@ -249,8 +248,9 @@ $.fn.scrum.addProject = function(project_id, project_name, bg_color, text_color)
 		class: 'scrum_project_title',
 		style: 'background-color: ' + bg_color + '; color: ' + text_color + ';',
 		text: project_name
+		// On click, create a new task
 	}).click(function() {
-		scrum.editMode(local.addTask('task_' + scrum.task_id, scrum.default_task_name, project_id, scrum.default_user_name));
+		scrum._editMode(local.addTask('task_' + scrum.task_id, scrum.default_task_name, project_id, scrum.default_user_name));
 		scrum.task_id++;
 	}));
 	
@@ -276,13 +276,14 @@ $.fn.scrum.addProject = function(project_id, project_name, bg_color, text_color)
 			} else {
 				$(this).children('.scrum_task').css('margin-bottom', '3px');
 			}
-			scrum.changeStatus({
-				task_id: task_id,
+			$(this).parents('.scrum').trigger('task_moved', [{
+				task_id: $(ui.draggable).attr('id'),
 				task_name: $('#' + task_id + '> .name').html() || $('#' + task_id + '> .name').val(),
 				user_name: $('#' + task_id + '> .user').html() || $('#' + task_id + '> .user').val(),
-				project_id: $(this).attr('id'),
-				status: status
-			});
+				status: $(this).parent().attr('id'),
+				project_id: project_id,
+				project_name: $('#' + project_id + '.scrum_project_title', local).html()
+			}]);
 		}
 	});
 	

@@ -13,7 +13,50 @@
 	<div class="scrum"></div>
 	<script type="text/javascript">
 		$(document).ready(function(){
-			$('.scrum').scrum().scrum.addProject('project_1', 'Project 1', '#7c5450', 'white').addProject('project_2', 'Project 2', '#55979a', 'black').addProject('project_3', 'Project 3', '#e74c3c', 'white');
+			$('.scrum').scrum().scrum
+				.addProject('project_1', 'Project 1', '#7c5450', 'white')
+				.addProject('project_2', 'Project 2', '#55979a', 'black')
+				.addProject('project_3', 'Project 3', '#e74c3c', 'white');
+
+			$('.scrum').on('task_created', function(e, task) {
+				console.log('Task Created: [task_id: "' +
+					task.task_id + '" task_name: "' +
+					task.task_name + '" user_name: "' +
+					task.user_name + '" status: "' +
+					task.status + '" project_id: "' +
+					task.project_id + '" project_name: "' +
+					task.project_name + '"]');
+			});
+			
+			$('.scrum').on('task_edited', function(e, task) {
+				console.log('Task Edited: [task_id: "' +
+					task.task_id + '" task_name: "' +
+					task.task_name + '" user_name: "' +
+					task.user_name + '" status: "' +
+					task.status + '" project_id: "' +
+					task.project_id + '" project_name: "' +
+					task.project_name + '"]');
+			});
+			
+			$('.scrum').on('task_deleted', function(e, task) {
+				console.log('Task Deleted: [task_id: "' +
+					task.task_id + '" task_name: "' +
+					task.task_name + '" user_name: "' +
+					task.user_name + '" status: "' +
+					task.status + '" project_id: "' +
+					task.project_id + '" project_name: "' +
+					task.project_name + '"]');
+			});
+			
+			$('.scrum').on('task_moved', function(e, task) {
+				console.log('Task Moved: [task_id: "' +
+					task.task_id + '" task_name: "' +
+					task.task_name + '" user_name: "' +
+					task.user_name + '" status: "' +
+					task.status + '" project_id: "' +
+					task.project_id + '" project_name: "' +
+					task.project_name + '"]');
+			});
 		});
 	</script>
 </body>
